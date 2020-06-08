@@ -90,6 +90,11 @@ func (uu users) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	}
 	return err
 }
+func (uu users) MarshalZerologArray(a *zerolog.Array){
+	for i := range uu {
+		a.Object(uu[i])
+	}
+}
 
 type user struct {
 	Name      string    `json:"name"`

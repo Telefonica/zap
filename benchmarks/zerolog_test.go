@@ -43,12 +43,8 @@ func fakeZerologFields(e *zerolog.Event) *zerolog.Event {
 		Time("time", _tenTimes[0]).
 		Times("times", _tenTimes).
 		Object("user1", _oneUser).
-		Object("user2", _oneUser)
-	array := zerolog.Arr()
-	for i:= 0; i < 10; i++ {
-		array = array.Object(_oneUser)
-	}
-	e.Array("users", array).
+		Object("user2", _oneUser).
+		Array("users", _tenUsers).
 		Err(errExample)
 	return e
 }
@@ -62,12 +58,8 @@ func fakeZerologContext(c zerolog.Context) zerolog.Context {
 		Time("time", _tenTimes[0]).
 		Times("times", _tenTimes).
 		Object("user1", _oneUser).
-		Object("user2", _oneUser)
-	array := zerolog.Arr()
-	for i:= 0; i < 10; i++ {
-		array = array.Object(_oneUser)
-	}
-	c.Array("users", array).
+		Object("user2", _oneUser).
+		Array("users", _tenUsers).
 		Err(errExample)
 	return c
 }
