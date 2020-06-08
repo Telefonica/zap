@@ -35,29 +35,39 @@ func newDisabledZerolog() zerolog.Logger {
 }
 
 func fakeZerologFields(e *zerolog.Event) *zerolog.Event {
-	return e.
+	e =  e.
 		Int("int", _tenInts[0]).
 		Ints("ints", _tenInts).
 		Str("string", _tenStrings[0]).
 		Strs("strings", _tenStrings).
 		Time("time", _tenTimes[0]).
 		Times("times", _tenTimes).
-		Interface("user1", _oneUser).
-		Interface("user2", _oneUser).
-		Interface("users", _tenUsers).
+		Object("user1", _oneUser).
+		Object("user2", _oneUser)
+	array := zerolog.Arr()
+	for i:= 0; i < 10; i++ {
+		array = array.Object(_oneUser)
+	}
+	e.Array("users", array).
 		Err(errExample)
+	return e
 }
 
 func fakeZerologContext(c zerolog.Context) zerolog.Context {
-	return c.
+	c = c.
 		Int("int", _tenInts[0]).
 		Ints("ints", _tenInts).
 		Str("string", _tenStrings[0]).
 		Strs("strings", _tenStrings).
 		Time("time", _tenTimes[0]).
 		Times("times", _tenTimes).
-		Interface("user1", _oneUser).
-		Interface("user2", _oneUser).
-		Interface("users", _tenUsers).
+		Object("user1", _oneUser).
+		Object("user2", _oneUser)
+	array := zerolog.Arr()
+	for i:= 0; i < 10; i++ {
+		array = array.Object(_oneUser)
+	}
+	c.Array("users", array).
 		Err(errExample)
+	return c
 }
