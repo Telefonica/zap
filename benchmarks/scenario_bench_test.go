@@ -30,6 +30,24 @@ import (
 
 func BenchmarkDisabledWithoutFields(b *testing.B) {
 	b.Logf("Logging at a disabled level without any structured context.")
+	b.Run("rs/zerolog", func(b *testing.B) {
+		logger := newDisabledZerolog()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info().Msg(getMessage(0))
+			}
+		})
+	})
+	b.Run("Telefonica/govice", func(b *testing.B) {
+		logger := newDisabledGovice()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info(getMessage(0))
+			}
+		})
+	})
 	b.Run("Zap", func(b *testing.B) {
 		logger := newZapLogger(zap.ErrorLevel)
 		b.ResetTimer()
@@ -99,6 +117,25 @@ func BenchmarkDisabledWithoutFields(b *testing.B) {
 
 func BenchmarkDisabledAccumulatedContext(b *testing.B) {
 	b.Logf("Logging at a disabled level with some accumulated context.")
+	b.Run("rs/zerolog", func(b *testing.B) {
+		logger := fakeZerologContext(newDisabledZerolog().With()).Logger()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info().Msg(getMessage(0))
+			}
+		})
+	})
+	b.Run("Telefonica/govice", func(b *testing.B) {
+		logger := newDisabledGovice()
+		setGoviceContext(logger)
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info(getMessage(0))
+			}
+		})
+	})
 	b.Run("Zap", func(b *testing.B) {
 		logger := newZapLogger(zap.ErrorLevel).With(fakeFields()...)
 		b.ResetTimer()
@@ -228,6 +265,24 @@ func BenchmarkDisabledAddingFields(b *testing.B) {
 
 func BenchmarkWithoutFields(b *testing.B) {
 	b.Logf("Logging without any structured context.")
+	b.Run("rs/zerolog", func(b *testing.B) {
+		logger := newZerolog()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info().Msg(getMessage(0))
+			}
+		})
+	})
+	b.Run("Telefonica/govice", func(b *testing.B) {
+		logger := newGovice()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info(getMessage(0))
+			}
+		})
+	})
 	b.Run("Zap", func(b *testing.B) {
 		logger := newZapLogger(zap.DebugLevel)
 		b.ResetTimer()
@@ -366,6 +421,25 @@ func BenchmarkWithoutFields(b *testing.B) {
 
 func BenchmarkAccumulatedContext(b *testing.B) {
 	b.Logf("Logging with some accumulated context.")
+	b.Run("rs/zerolog", func(b *testing.B) {
+		logger := fakeZerologContext(newZerolog().With()).Logger()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info().Msg(getMessage(0))
+			}
+		})
+	})
+	b.Run("Telefonica/govice", func(b *testing.B) {
+		logger := newGovice()
+		setGoviceContext(logger)
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.Info(getMessage(0))
+			}
+		})
+	})
 	b.Run("Zap", func(b *testing.B) {
 		logger := newZapLogger(zap.DebugLevel).With(fakeFields()...)
 		b.ResetTimer()
@@ -486,6 +560,25 @@ func BenchmarkAccumulatedContext(b *testing.B) {
 
 func BenchmarkAddingFields(b *testing.B) {
 	b.Logf("Logging with additional context at each log site.")
+	b.Run("rs/zerolog", func(b *testing.B) {
+		logger := newZerolog()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				fakeZerologFields(logger.Info()).Msg(getMessage(0))
+			}
+		})
+	})
+	b.Run("Telefonica/govice", func(b *testing.B) {
+		logger := newGovice()
+		context := fakeGoviceContext()
+		b.ResetTimer()
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				logger.InfoC(context, getMessage(0))
+			}
+		})
+	})
 	b.Run("Zap", func(b *testing.B) {
 		logger := newZapLogger(zap.DebugLevel)
 		b.ResetTimer()

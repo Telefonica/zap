@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/rs/zerolog"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"go.uber.org/zap/internal/ztest"
@@ -89,6 +90,11 @@ func (uu users) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 	}
 	return err
 }
+func (uu users) MarshalZerologArray(a *zerolog.Array){
+	for i := range uu {
+		a.Object(uu[i])
+	}
+}
 
 type user struct {
 	Name      string    `json:"name"`
@@ -102,6 +108,15 @@ func (u *user) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	enc.AddInt64("createdAt", u.CreatedAt.UnixNano())
 	return nil
 }
+func (u *user) MarshalZerologObject(e *zerolog.Event) {
+	if u != nil {
+		e.Str("name", u.Name).
+			Str("email", u.Email).
+			Int64("createdAt", u.CreatedAt.UnixNano())
+	}
+}
+
+var _ zerolog.LogObjectMarshaler = &user{}
 
 func newZapLogger(lvl zapcore.Level) *zap.Logger {
 	ec := zap.NewProductionEncoderConfig()
